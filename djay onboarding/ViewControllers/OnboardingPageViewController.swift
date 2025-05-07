@@ -9,7 +9,8 @@ import UIKit
 class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     
     private var steps: [OnboardingStep] = [
-        OnboardingStep(title: "Welcome to djay!", description: "Welcome to djay!", imageName: "logo", buttonTitle: "Continue")
+        OnboardingStep(title: "Welcome to djay!", description: "Welcome to djay!", imageName: "logo", buttonTitle: "Continue"),
+        OnboardingStep(title: "Mix Your Favorite Music", description: "", imageName: "", buttonTitle: "Continue")
     ]
     
     private var currentIndex = 0
@@ -26,14 +27,28 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
         }
     }
     
-    private func viewController(at index: Int) -> OnboardingWelcomeStepViewController? {
+    private func viewController(at index: Int) -> UIViewController? {
         guard index >= 0, index < steps.count else { return nil }
-        let vc = OnboardingWelcomeStepViewController()
-        vc.step = steps[index]
-        vc.buttonAction = { [weak self] in
-            self?.handleNextStep()
+        switch index {
+        case 0:
+            let vc = OnboardingWelcomeStepViewController()
+            vc.step = steps[index]
+            vc.buttonAction = { [weak self] in
+                self?.handleNextStep()
+            }
+            return vc
+        case 1:
+            return OnboardingInfoStepViewController(
+                step: steps[index],
+                logoImage: .logo,
+                heroImage: .hero,
+                adaImage: .ADA) { [weak self] in
+                    self?.handleNextStep()
+                    
+                }
+        default:
+            return nil
         }
-        return vc
     }
     
     private func handleNextStep() {
