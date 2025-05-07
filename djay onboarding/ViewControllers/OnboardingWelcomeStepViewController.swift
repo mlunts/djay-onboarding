@@ -14,6 +14,22 @@ class OnboardingWelcomeStepViewController: UIViewController {
     private let titleLabel = UILabel()
     private let imageView = UIImageView()
     private let actionButton = ActionButton()
+    private struct Constants {
+        // Image View Constraints
+        static let imageTopSpacing: CGFloat = 255
+        static let imageLeadingPadding: CGFloat = 81
+        static let imageTrailingPadding: CGFloat = -99
+        static let imageHeight: CGFloat = 64
+        
+        // Button Constraints
+        static let buttonBottomSpacing: CGFloat = -56
+        static let buttonHorizontalPadding: CGFloat = 32
+        static let buttonHeight: CGFloat = 44
+        
+        // Title Label Constraints
+        static let titleBottomSpacingToButton: CGFloat = -24
+        static let titleHorizontalPadding: CGFloat = 41
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +39,7 @@ class OnboardingWelcomeStepViewController: UIViewController {
     }
     
     private func setupLayout() {
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
+        titleLabel.font = UIFont.systemFont(ofSize: 22, weight: .regular)
         titleLabel.textColor = .contextualPrimary
         titleLabel.textAlignment = .center
         
@@ -37,19 +53,23 @@ class OnboardingWelcomeStepViewController: UIViewController {
         }
         
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            // Image View
+            imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.imageTopSpacing),
             imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: 240),
-            imageView.heightAnchor.constraint(equalToConstant: 240),
+            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.imageLeadingPadding),
+            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: Constants.imageTrailingPadding),
+            imageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight),
             
-            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-                 
-            actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
-            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
-            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
-            actionButton.heightAnchor.constraint(equalToConstant: 50)
+            // Button
+            actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.buttonBottomSpacing),
+            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonHorizontalPadding),
+            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonHorizontalPadding),
+            actionButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
+            
+            // Title Label
+            titleLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: Constants.titleBottomSpacingToButton),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.titleHorizontalPadding),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.titleHorizontalPadding),
         ])
     }
     
