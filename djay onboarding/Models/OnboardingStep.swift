@@ -7,7 +7,18 @@
 
 struct OnboardingStep {
     let title: String
-    let description: String
-    let imageName: String?
+    let description: String?
     let buttonTitle: String
+    let skills: [Skill]?
+    
+    init(title: String, description: String? = nil, buttonTitle: String, skills: [Skill]? = nil) {
+        self.title = title
+        self.description = description
+        self.buttonTitle = buttonTitle
+        self.skills = skills
+    }
+}
+
+struct Skill {
+    let name: String
 }
