@@ -8,8 +8,9 @@ import UIKit
 
 class OnboardingWelcomeStepViewController: UIViewController {
     
-    var step: OnboardingStep?
-    var buttonAction: (() -> Void)?
+    var step: OnboardingStep
+    var image: UIImage?
+    var buttonAction: (() -> Void)
     
     private let titleLabel = UILabel()
     private let imageView = UIImageView()
@@ -29,6 +30,20 @@ class OnboardingWelcomeStepViewController: UIViewController {
         // Title Label Constraints
         static let titleBottomSpacingToButton: CGFloat = -24
         static let titleHorizontalPadding: CGFloat = 41
+    }
+    
+    init(step: OnboardingStep, image: UIImage?, buttonAction: @escaping (() -> Void)) {
+        self.step = step
+        if let image {
+            self.image = image
+        }
+        
+        self.buttonAction = buttonAction
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -74,13 +89,12 @@ class OnboardingWelcomeStepViewController: UIViewController {
     }
     
     private func configureContent() {
-        guard let step = step else { return }
         titleLabel.text = step.title
-        imageView.image = step.imageName != nil ? UIImage(named: step.imageName!) : nil
+        imageView.image = image
         actionButton.setTitle(step.buttonTitle, for: .normal)
     }
     
     @objc private func buttonTapped() {
-        buttonAction?()
+        buttonAction()
     }
 }
