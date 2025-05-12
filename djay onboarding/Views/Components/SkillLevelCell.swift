@@ -41,7 +41,7 @@ class SkillLevelCell: UITableViewCell {
         contentView.addSubview(containerView)
         
         checkmarkView.translatesAutoresizingMaskIntoConstraints = false
-        checkmarkView.contentMode = .center
+        checkmarkView.contentMode = .scaleAspectFit
         checkmarkView.tintColor = .contextualUnactive
         containerView.addSubview(checkmarkView)
         
