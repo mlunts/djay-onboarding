@@ -10,35 +10,34 @@ class OnboardingWelcomeStepViewController: UIViewController {
     
     var step: OnboardingStep
     var image: UIImage?
-    var buttonAction: (() -> Void)
+    var onNextTapped: (() -> Void)?
     
     private let titleLabel = UILabel()
     private let imageView = UIImageView()
-    private let actionButton = ActionButton()
+    
+    private var imageViewTopConstraint: NSLayoutConstraint!
+    
     private struct Constants {
         // Image View Constraints
         static let imageTopSpacing: CGFloat = 255
-        static let imageLeadingPadding: CGFloat = 81
-        static let imageTrailingPadding: CGFloat = -99
+        static let imageLeadingPadding: CGFloat = 90
+        static let imageTrailingPadding: CGFloat = -90
         static let imageHeight: CGFloat = 64
         
-        // Button Constraints
-        static let buttonBottomSpacing: CGFloat = -56
-        static let buttonHorizontalPadding: CGFloat = 32
-        static let buttonHeight: CGFloat = 44
+        static let logoTopSpacing: CGFloat = 120
+        static let logoSidePadding: CGFloat = 90
         
         // Title Label Constraints
-        static let titleBottomSpacingToButton: CGFloat = -24
+        static let titleBottomSpacingToButton: CGFloat = -124
         static let titleHorizontalPadding: CGFloat = 41
     }
     
-    init(step: OnboardingStep, image: UIImage?, buttonAction: @escaping (() -> Void)) {
+    init(step: OnboardingStep, image: UIImage?) {
         self.step = step
         if let image {
             self.image = image
         }
         
-        self.buttonAction = buttonAction
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -60,29 +59,22 @@ class OnboardingWelcomeStepViewController: UIViewController {
         
         imageView.contentMode = .scaleAspectFit
         
-        actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        
-        [titleLabel, imageView, actionButton].forEach {
+        [titleLabel, imageView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
         
+        imageViewTopConstraint = imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.imageTopSpacing)
+        
         NSLayoutConstraint.activate([
             // Image View
-            imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.imageTopSpacing),
-            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageViewTopConstraint,
             imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.imageLeadingPadding),
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: Constants.imageTrailingPadding),
             imageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight),
             
-            // Button
-            actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.buttonBottomSpacing),
-            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonHorizontalPadding),
-            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonHorizontalPadding),
-            actionButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
-            
             // Title Label
-            titleLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: Constants.titleBottomSpacingToButton),
+            titleLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.titleBottomSpacingToButton),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.titleHorizontalPadding),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.titleHorizontalPadding),
         ])
@@ -91,10 +83,15 @@ class OnboardingWelcomeStepViewController: UIViewController {
     private func configureContent() {
         titleLabel.text = step.title
         imageView.image = image
-        actionButton.setTitle(step.buttonTitle, for: .normal)
     }
     
-    @objc private func buttonTapped() {
-        buttonAction()
+    func animate(completion: @escaping () -> Void) {
+        imageViewTopConstraint.constant = Constants.logoTopSpacing
+        UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseIn, animations: {
+            self.view.layoutIfNeeded()
+            self.titleLabel.frame = CGRect(x: self.titleLabel.frame.origin.x, y: self.titleLabel.frame.origin.y + 60, width: self.titleLabel.frame.width, height: self.titleLabel.frame.height)
+        }, completion: { _ in
+            completion()
+        })
     }
 }

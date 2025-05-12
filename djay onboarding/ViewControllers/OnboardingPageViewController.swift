@@ -10,6 +10,7 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
     
     private let pageControl = UIPageControl()
     private let gradientLayer = CAGradientLayer()
+    private let actionButton = ActionButton()
     
     private var steps: [OnboardingStep] = [
         OnboardingStep(title: "Welcome to djay!", description: "Welcome to djay!", buttonTitle: "Continue"),
@@ -25,11 +26,17 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
     ]
     
     private var currentIndex = 0
+    private struct Constants {
+        // Button Constraints
+        static let buttonBottomSpacing: CGFloat = -56
+        static let buttonHorizontalPadding: CGFloat = 32
+        static let buttonHeight: CGFloat = 44
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        dataSource = nil // Disable swiping
+        dataSource = nil
         delegate = self
         
         setupUI()
@@ -37,41 +44,41 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
         if let firstVC = viewController(at: 0) {
             setViewControllers([firstVC], direction: .forward, animated: false)
         }
-        
-        setupPageControl()
     }
     
     // MARK: - View Controller Setup
     
     private func viewController(at index: Int) -> UIViewController? {
         guard index >= 0, index < steps.count else { return nil }
+        let step = steps[index]
+        actionButton.setTitle(step.buttonTitle, for: .normal)
+        
         switch index {
         case 0:
             return OnboardingWelcomeStepViewController(
-                step: steps[index],
-                image: .logo) { [weak self] in
-                    self?.handleNextStep()
-                }
+                step: step,
+                image: .logo)
         case 1:
             return OnboardingInfoStepViewController(
-                step: steps[index],
+                step: step,
                 logoImage: .logo,
                 heroImage: .hero,
-                adaImage: .ADA) { [weak self] in
-                    self?.handleNextStep()
-                }
+                adaImage: .ADA)
         case 2:
-            return OnboardingSkillSelectionViewController(
-                step: steps[index],
-                image: .icon) { [weak self] in
-                    self?.handleNextStep()
-                }
+            updateButton(isActive: false)
+            let vc = OnboardingSkillSelectionViewController(
+                step: step,
+                image: .icon)
+            
+            vc.onSkillSelected = { [weak self] in
+                self?.updateButton(isActive: true)
+            }
+            
+            return vc
         case 3:
             return OnboardingWelcomeStepViewController(
-                step: steps[index],
-                image: nil) { [weak self] in
-                    self?.handleNextStep()
-                }
+                step: step,
+                image: nil)
         default:
             return nil
         }
@@ -82,60 +89,18 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
     private func handleNextStep() {
         let nextIndex = currentIndex + 1
         if nextIndex < steps.count, let nextVC = viewController(at: nextIndex) {
+            let shouldAnimate = currentIndex == 2 && nextIndex == 3
             
-            setViewControllers([nextVC], direction: .forward, animated: false) { [weak self] _ in
+            setViewControllers([nextVC], direction: .forward, animated: shouldAnimate) { [weak self] _ in
                 guard let self = self else { return }
-                
-                // Custom transition for 0 → 1
-                if currentIndex == 0 && nextIndex == 1 {
-                    nextVC.view.alpha = 0
-                    nextVC.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                    
-                    UIView.animate(withDuration: 0.6,
-                                   delay: 0,
-                                   usingSpringWithDamping: 0.8,
-                                   initialSpringVelocity: 0.5,
-                                   options: [.curveEaseInOut],
-                                   animations: {
-                        nextVC.view.alpha = 1
-                        nextVC.view.transform = .identity
-                    })
-                } else if currentIndex == 1 && nextIndex == 2 {
-                    // 1 → 2 Slide transition
-                    let containerView = self.view!
-                    
-                    let fromView = containerView.subviews.first(where: { $0 is UIView && $0 != self.pageControl })!
-                    let toView = nextVC.view!
-                    
-                    let width = containerView.bounds.width
-                    toView.frame = containerView.bounds.offsetBy(dx: width, dy: 0)
-                    containerView.addSubview(toView)
-                    
-                    UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
-                        fromView.frame = containerView.bounds.offsetBy(dx: -width, dy: 0)
-                        toView.frame = containerView.bounds
-                    }, completion: { _ in
-                        fromView.removeFromSuperview()
-                    })
-                    
-                } else {
-                    // Fade transition for others
-                    nextVC.view.alpha = 0
-                    UIView.animate(withDuration: 0.4) {
-                        nextVC.view.alpha = 1
-                    }
-                }
-                
-                
-                // Update index & page control
                 self.currentIndex = nextIndex
                 self.pageControl.currentPage = nextIndex
             }
-            
         } else {
             dismiss(animated: true)
         }
     }
+    
     
     // MARK: - UIPageViewController Data Source (disabled)
     
@@ -151,6 +116,9 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
     
     private func setupUI() {
         addGradient()
+        
+        setupButton()
+        setupPageControl()
     }
     
     private func addGradient() {
@@ -175,5 +143,34 @@ class OnboardingPageViewController: UIPageViewController, UIPageViewControllerDa
             pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
+    }
+    
+    private func setupButton() {
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(actionButton)
+        actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
+            // Button
+            actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.buttonBottomSpacing),
+            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonHorizontalPadding),
+            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonHorizontalPadding),
+            actionButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
+        ])
+    }
+    
+    @objc private func buttonTapped() {
+        if let currentVC = viewControllers?.first as? OnboardingWelcomeStepViewController {
+            currentVC.animate {
+                self.handleNextStep()
+            }
+        } else {
+            handleNextStep()
+        }
+    }
+    
+    private func updateButton(isActive: Bool = false) {
+        actionButton.isEnabled = isActive
+        actionButton.layer.opacity = isActive ? 1 : 0.3
     }
 }

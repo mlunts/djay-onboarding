@@ -5,17 +5,14 @@
 //  Created by Marina Lunts on 08.05.25.
 //
 
-
 import UIKit
 
 class OnboardingSkillSelectionViewController: UIViewController {
-    
-    private let buttonAction: (() -> Void)?
-    
+    var onSkillSelected: (() -> Void)?
+
     private let titleName: String
     private let subtitle: String
     private let skills: [Skill]
-    private let buttonTitle: String
     private let image: UIImage
     
     private let imageView = UIImageView()
@@ -23,16 +20,14 @@ class OnboardingSkillSelectionViewController: UIViewController {
     private let subtitleLabel = UILabel()
     
     private let tableView = UITableView()
-    private let actionButton = ActionButton()
         
     private var selectedIndex: IndexPath? {
         didSet {
             tableView.reloadData()
-            updateButtonView(isActive: true)
-            actionButton.isEnabled = selectedIndex != nil
+            onSkillSelected?()
         }
     }
-    
+
     private struct Constants {
         static let sidePadding: CGFloat = 32
         
@@ -49,13 +44,11 @@ class OnboardingSkillSelectionViewController: UIViewController {
         static let buttonHorizontalPadding: CGFloat = 32
     }
     
-    init(step: OnboardingStep, image: UIImage, buttonAction: (() -> Void)? = nil) {
+    init(step: OnboardingStep, image: UIImage) {
         self.titleName = step.title
         self.subtitle = step.description ?? ""
         self.skills = step.skills ?? []
-        self.buttonTitle = step.buttonTitle
         self.image = image
-        self.buttonAction = buttonAction
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -91,12 +84,6 @@ class OnboardingSkillSelectionViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
-        actionButton.isEnabled = false
-        actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        actionButton.translatesAutoresizingMaskIntoConstraints = false
-        updateButtonView()
-        view.addSubview(actionButton)
-        
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.imageTopSpacing),
             imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -115,11 +102,6 @@ class OnboardingSkillSelectionViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sidePadding),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sidePadding),
             tableView.heightAnchor.constraint(equalToConstant: Constants.tableHeight),
-            
-            actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.buttonBottomSpacing),
-            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonHorizontalPadding),
-            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonHorizontalPadding),
-            actionButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
         ])
     }
     
@@ -132,20 +114,10 @@ class OnboardingSkillSelectionViewController: UIViewController {
         tableView.register(SkillLevelCell.self, forCellReuseIdentifier: "SkillLevelCell")
     }
     
-    @objc private func buttonTapped() {
-        buttonAction?()
-    }
-    
     private func configureContent() {
         titleLabel.text = titleName
         subtitleLabel.text = subtitle
         imageView.image = image
-
-        actionButton.setTitle(buttonTitle, for: .normal)
-    }
-    
-    private func updateButtonView(isActive: Bool = false) {
-        actionButton.layer.opacity = isActive ? 1 : 0.3
     }
 }
 

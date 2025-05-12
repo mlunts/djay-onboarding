@@ -14,15 +14,11 @@ class OnboardingInfoStepViewController: UIViewController {
     var heroImage: UIImage?
     var adaimage: UIImage?
     
-    var buttonAction: (() -> Void)?
-    
     private let titleLabel = UILabel()
     
     private let logoImageView = UIImageView()
     private let heroImageView = UIImageView()
     private let adaImageView = UIImageView()
-    
-    private let actionButton = ActionButton()
     
     private var imageViews: [UIImageView] {
         return [logoImageView, heroImageView, adaImageView]
@@ -43,20 +39,13 @@ class OnboardingInfoStepViewController: UIViewController {
         
         static let adaTopSpacing: CGFloat = 32
         static let adaSidePadding: CGFloat = 95.3
-    
-        
-        // Button Constraints
-        static let buttonBottomSpacing: CGFloat = -56
-        static let buttonHorizontalPadding: CGFloat = 32
-        static let buttonHeight: CGFloat = 44
     }
     
-    init(step: OnboardingStep?, logoImage: UIImage?, heroImage: UIImage?, adaImage: UIImage?, buttonAction: (() -> Void)? = nil) {
+    init(step: OnboardingStep?, logoImage: UIImage?, heroImage: UIImage?, adaImage: UIImage?) {
         self.step = step
         self.logoImage = logoImage
         self.heroImage = heroImage
         self.adaimage = adaImage
-        self.buttonAction = buttonAction
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -79,9 +68,7 @@ class OnboardingInfoStepViewController: UIViewController {
         
         imageViews.forEach({ $0.contentMode = .scaleAspectFill })
         
-        actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        
-        [logoImageView, heroImageView,titleLabel, adaImageView, actionButton].forEach {
+        [logoImageView, heroImageView,titleLabel, adaImageView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -109,12 +96,6 @@ class OnboardingInfoStepViewController: UIViewController {
             adaImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.adaSidePadding),
             adaImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.adaSidePadding),
             adaImageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight),
-            
-            // Button
-            actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.buttonBottomSpacing),
-            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonHorizontalPadding),
-            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonHorizontalPadding),
-            actionButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
         ])
     }
     
@@ -125,11 +106,5 @@ class OnboardingInfoStepViewController: UIViewController {
         logoImageView.image = logoImage
         adaImageView.image = adaimage
         heroImageView.image = heroImage
-        
-        actionButton.setTitle(step.buttonTitle, for: .normal)
-    }
-    
-    @objc private func buttonTapped() {
-        buttonAction?()
     }
 }
