@@ -60,6 +60,11 @@ class OnboardingInfoStepViewController: UIViewController {
         configureContent()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        animateEntrance()
+    }
+    
     private func setupLayout() {
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         titleLabel.textColor = .contextualPrimary
@@ -98,6 +103,29 @@ class OnboardingInfoStepViewController: UIViewController {
             adaImageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight),
         ])
     }
+    
+    private func animateEntrance() {
+        // Set initial states
+        let images = [adaImageView, heroImageView]
+        images.forEach { imageView in
+            imageView.alpha = 0
+            imageView.transform = CGAffineTransform(scaleX: 0.4, y: 0.4)
+        }
+        
+        titleLabel.alpha = 0
+        titleLabel.transform = CGAffineTransform(scaleX: 0.4, y: 0.4)
+
+        // Animate them in
+        UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseOut, animations: {
+            images.forEach { imageView in
+                imageView.alpha = 1
+                imageView.transform = .identity
+            }
+            self.titleLabel.alpha = 1
+            self.titleLabel.transform = .identity
+        })
+    }
+
     
     private func configureContent() {
         guard let step = step else { return }

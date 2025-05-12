@@ -87,7 +87,7 @@ class OnboardingWelcomeStepViewController: UIViewController {
     
     func animate(completion: @escaping () -> Void) {
         imageViewTopConstraint.constant = Constants.logoTopSpacing
-        UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseIn, animations: {
+        UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseIn, animations: {
             self.view.layoutIfNeeded()
             self.titleLabel.frame = CGRect(x: self.titleLabel.frame.origin.x, y: self.titleLabel.frame.origin.y + 60, width: self.titleLabel.frame.width, height: self.titleLabel.frame.height)
         }, completion: { _ in
