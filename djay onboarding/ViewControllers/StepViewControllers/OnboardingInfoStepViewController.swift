@@ -122,6 +122,8 @@ class OnboardingInfoStepViewController: UIViewController {
             adaImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             adaHeightConstraint
         ])
+        
+        handleOrientationChange()
     }
     
     private func animateEntrance() {

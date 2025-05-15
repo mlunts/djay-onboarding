@@ -86,6 +86,8 @@ class OnboardingWelcomeStepViewController: UIViewController {
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.titleHorizontalPadding),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.titleHorizontalPadding)
         ])
+        
+        handleOrientationChange()
     }
     
     private func configureContent() {

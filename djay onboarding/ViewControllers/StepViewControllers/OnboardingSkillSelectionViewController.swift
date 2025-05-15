@@ -125,6 +125,8 @@ class OnboardingSkillSelectionViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sidePadding),
             tableHeightConstraint
         ])
+        
+        handleOrientationChange()
     }
     
     private func setupTableView() {
