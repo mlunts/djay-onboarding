@@ -1,9 +1,9 @@
-//
 //  OnboardingStepViewController.swift
 //  djay onboarding
 //
 //  Created by Marina Lunts on 05.05.25.
 //
+
 import UIKit
 
 class OnboardingWelcomeStepViewController: UIViewController {
@@ -15,29 +15,29 @@ class OnboardingWelcomeStepViewController: UIViewController {
     private let titleLabel = UILabel()
     private let imageView = UIImageView()
     
+    // MARK: - Adjustable Constraints
     private var imageViewTopConstraint: NSLayoutConstraint!
+    private var imageViewHeightConstraint: NSLayoutConstraint!
+    private var titleBottomConstraint: NSLayoutConstraint!
     
     private struct Constants {
-        // Image View Constraints
+        // Image View
         static let imageTopSpacing: CGFloat = 255
         static let imageLeadingPadding: CGFloat = 90
         static let imageTrailingPadding: CGFloat = -90
         static let imageHeight: CGFloat = 64
         
+        // Logo (reused spacing)
         static let logoTopSpacing: CGFloat = 120
-        static let logoSidePadding: CGFloat = 90
         
-        // Title Label Constraints
+        // Title Label
         static let titleBottomSpacingToButton: CGFloat = -124
         static let titleHorizontalPadding: CGFloat = 41
     }
     
     init(step: OnboardingStep, image: UIImage?) {
         self.step = step
-        if let image {
-            self.image = image
-        }
-        
+        self.image = image
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -52,10 +52,18 @@ class OnboardingWelcomeStepViewController: UIViewController {
         configureContent()
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { _ in
+            self.handleOrientationChange()
+        })
+    }
+    
     private func setupLayout() {
         titleLabel.font = UIFont.systemFont(ofSize: 22, weight: .regular)
         titleLabel.textColor = .contextualPrimary
         titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 0
         
         imageView.contentMode = .scaleAspectFit
         
@@ -65,24 +73,40 @@ class OnboardingWelcomeStepViewController: UIViewController {
         }
         
         imageViewTopConstraint = imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.imageTopSpacing)
+        imageViewHeightConstraint = imageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight)
+        titleBottomConstraint = titleLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.titleBottomSpacingToButton)
         
         NSLayoutConstraint.activate([
-            // Image View
             imageViewTopConstraint,
             imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.imageLeadingPadding),
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: Constants.imageTrailingPadding),
-            imageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight),
+            imageViewHeightConstraint,
             
-            // Title Label
-            titleLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.titleBottomSpacingToButton),
+            titleBottomConstraint,
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.titleHorizontalPadding),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.titleHorizontalPadding),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.titleHorizontalPadding)
         ])
     }
     
     private func configureContent() {
         titleLabel.text = step.title
         imageView.image = image
+    }
+    
+    private func handleOrientationChange() {
+        let isLandscape = UIDevice.current.orientation.isLandscape
+        
+        if isLandscape {
+            imageViewTopConstraint.constant = Constants.logoTopSpacing / 2
+            imageViewHeightConstraint.constant = Constants.imageHeight / 2
+            titleBottomConstraint.constant = Constants.titleBottomSpacingToButton + 20
+        } else {
+            imageViewTopConstraint.constant = Constants.imageTopSpacing
+            imageViewHeightConstraint.constant = Constants.imageHeight
+            titleBottomConstraint.constant = Constants.titleBottomSpacingToButton
+        }
+        
+        view.layoutIfNeeded()
     }
     
     func animate(completion: @escaping () -> Void) {
