@@ -94,16 +94,14 @@ class OnboardingWelcomeStepViewController: UIViewController {
     }
     
     private func handleOrientationChange() {
-        let isLandscape = UIDevice.current.orientation.isLandscape
+        let isLandscape = UIWindow.isLandscape
         
         if isLandscape {
             imageViewTopConstraint.constant = Constants.logoTopSpacing / 2
             imageViewHeightConstraint.constant = Constants.imageHeight / 2
-            titleBottomConstraint.constant = Constants.titleBottomSpacingToButton + 20
         } else {
             imageViewTopConstraint.constant = Constants.imageTopSpacing
             imageViewHeightConstraint.constant = Constants.imageHeight
-            titleBottomConstraint.constant = Constants.titleBottomSpacingToButton
         }
         
         view.layoutIfNeeded()
