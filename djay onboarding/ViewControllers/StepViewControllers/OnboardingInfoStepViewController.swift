@@ -8,10 +8,11 @@ import UIKit
 
 class OnboardingInfoStepViewController: UIViewController {
     
-    var step: OnboardingStep?
+    var step: OnboardingStep
     var logoImage: UIImage?
     var heroImage: UIImage?
     var adaimage: UIImage?
+    var shouldAnimate: Bool
     
     private let titleLabel = UILabel()
     private let logoImageView = UIImageView()
@@ -45,11 +46,12 @@ class OnboardingInfoStepViewController: UIViewController {
     private var adaTopConstraint: NSLayoutConstraint!
     private var adaHeightConstraint: NSLayoutConstraint!
     
-    init(step: OnboardingStep?, logoImage: UIImage?, heroImage: UIImage?, adaImage: UIImage?) {
+    init(step: OnboardingStep, logoImage: UIImage? = nil, heroImage: UIImage? = nil, adaImage: UIImage? = nil, shouldAnimate: Bool = true) {
         self.step = step
         self.logoImage = logoImage
         self.heroImage = heroImage
         self.adaimage = adaImage
+        self.shouldAnimate = shouldAnimate
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -73,7 +75,9 @@ class OnboardingInfoStepViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        animateEntrance()
+        if shouldAnimate {
+            animateEntrance()
+        }
     }
     
     private func setupLayout() {
@@ -140,7 +144,6 @@ class OnboardingInfoStepViewController: UIViewController {
     }
     
     private func configureContent() {
-        guard let step = step else { return }
         titleLabel.text = step.title
         logoImageView.image = logoImage
         heroImageView.image = heroImage
